@@ -42,4 +42,4 @@ models:
       +materialized: table
     brz:
       +materialized: table
-      +schema: brz
+      #+schema: brz
