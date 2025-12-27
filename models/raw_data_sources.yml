@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: raw_data
+    database: dbt_ebp          # Databricks catalog
+    schema: raw_data
+    tables:
+      - name: engine_01

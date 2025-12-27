@@ -44,4 +44,7 @@ models:
     #   +materialized: table
       #+schema: brz
 on-run-start:
-  - "CREATE DATABASE IF NOT EXISTS raw_data"    
+  - "CREATE DATABASE IF NOT EXISTS raw_data"  
+
+
+
