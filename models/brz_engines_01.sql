@@ -1,6 +1,6 @@
 {{ config(
   materialized='streaming_table',
-  schema='bronze',
+  schema='dev_bronze',
   alias='brz_engines',
   tblproperties={
     'quality': 'bronze',
@@ -19,7 +19,7 @@ with src as (
     cast(configuration_status as string) as configuration_status,
     current_timestamp()                  as ingest_ts,
     'dbt_ebp.raw_data.engine_01'         as source_table
-  from stream {{ source('raw_data', 'engine_01') }}
+  from STREAM({{ source('raw_data', 'engine_01') }})
 )
 select *
 from src
