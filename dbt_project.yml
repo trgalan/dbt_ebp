@@ -37,12 +37,11 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 models:
   my_new_project:
-    # Applies to all files under models/example/
-    # example:
-    #   +materialized: table
-    # brz:
-    #   +materialized: table
-      #+schema: brz
+    +materialized: view
+    brz:
+      +materialized: table
+      +schema: brz
+
 on-run-start:
   - "CREATE DATABASE IF NOT EXISTS raw_data"  
 

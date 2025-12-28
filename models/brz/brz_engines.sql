@@ -1,11 +1,5 @@
-{{ config(
-  materialized='incremental',
-  schema='dev',
-  alias='brz_engines',
-  unique_key='engine_id',
-  incremental_strategy='merge',
-) }}
-
+{{ config(materialized='incremental', unique_key='engine_id', file_format='delta', incremental_strategy='merge') }}
+with raw as ( select * from {{ source('raw_data', 'engine_01') }} ) 
 select
   cast(engine_id as string)            as engine_id,
   cast(engine_model_id as string)      as engine_model_id,
@@ -16,5 +10,7 @@ select
   cast(configuration_status as string) as configuration_status,
   current_timestamp()                  as ingest_ts,
   'dbt_ebp.raw_data.engine_01'         as source_table
-from {{ source('raw_data', 'engine_01') }}
-where engine_id is not null
+from raw
+{% if is_incremental() %}
+where ingest_ts >= (select max(ingest_ts) from {{ this }})
+{% endif %};
