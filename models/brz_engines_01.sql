@@ -3,7 +3,8 @@
   schema='dev_bronze',
   alias='brz_engines',
   unique_key='engine_id',
-  incremental_strategy='merge'
+  incremental_strategy='merge',
+  schema='dbt_dev'
 ) }}
 
 select
