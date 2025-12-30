@@ -29,6 +29,6 @@ from staged
 
 {% if is_incremental() %}
 where staged.arrival_ts >
-      (select coalesce(max(t.arrival_ts), cast('1900-01-01 00:00:00' as timestamp)) from {{ this }} t)
+       (select max(arrival_ts) from {{ this }})
 {% endif %}
 ;
