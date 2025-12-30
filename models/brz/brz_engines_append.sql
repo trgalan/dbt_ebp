@@ -4,9 +4,8 @@
     incremental_strategy='append'
 ) }}
 
--- Append-only raw landing:
--- No is_incremental() filter because there is no reliable arrival watermark.
--- Late arrivals are simply appended whenever they appear upstream.
+-- Append-only raw landing using an arrival watermark.
+-- arrival_ts is a DATE-only watermark normalized to midnight (00:00:00).
 
 with src as (
   select *
@@ -22,10 +21,19 @@ select
   to_date(in_service_date, 'M/d/yyyy') as in_service_date,
   cast(configuration_status as string) as configuration_status,
 
-  -- Keep an ingestion timestamp for observability only (NOT a watermark)
+  -- DATE-only arrival watermark persisted as TIMESTAMP at 00:00:00
+  to_timestamp(current_date())         as arrival_ts,
+
+  -- Optional operational observability (not used for watermarking)
   current_timestamp()                  as ingest_ts,
 
   -- Optional row provenance
   'raw_data.engine_01'                 as source_relation
+
 from src
+
+{% if is_incremental() %}
+where to_timestamp(current_date()) >
+      (select max(arrival_ts) from {{ this }})
+{% endif %}
 ;
