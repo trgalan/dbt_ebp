@@ -1,10 +1,5 @@
 {{ config(
-    materialized='streaming_table',
-    -- schema='dbt_brz',
-    -- alias='brz_engines_auto_dlt',
-    tblproperties={
-      'quality': 'bronze',
-      'pipelines.autoOptimize.managed': 'true'
+    materialized='streaming_table',tblproperties={'quality': 'bronze', 'pipelines.autoOptimize.managed': 'true'
     }
 ) }}
 
