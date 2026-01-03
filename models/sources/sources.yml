@@ -1,0 +1,47 @@
+version: 2
+
+sources:
+  - name: brz
+    description: "Bronze (raw/ingest) Delta tables produced by ingestion pipelines."
+
+
+    tables:
+      - name: brz_engines_auto_dlt
+        description: "Bronze engines streaming ingestion output (typed as strings + metadata columns)."
+
+        columns:
+          - name: engine_id
+            description: "Engine natural key from inbound file."
+            tests:
+              - not_null
+
+          - name: engine_model_id
+            description: "Engine model identifier."
+
+          - name: serial_number
+            description: "Engine serial number."
+
+          - name: thrust_class
+            description: "Thrust class."
+
+          - name: operator_customer
+            description: "Operator / customer."
+
+          - name: in_service_date
+            description: "Standardized in-service date (DATE)."
+
+          - name: configuration_status
+            description: "Engine configuration status."
+
+          - name: ingest_ts
+            description: "File modification timestamp captured at ingestion (event time for ingestion)."
+            tests:
+              - not_null
+
+          - name: source_file
+            description: "Inbound file path for lineage/audit."
+            tests:
+              - not_null
+
+          - name: _rescue
+            description: "Rescued / malformed fields captured during permissive parsing."

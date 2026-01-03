@@ -41,6 +41,9 @@ models:
     brz:
       +materialized: table
       +schema: brz
+    sil:
+      +materialized: table
+      +schema: sil  
 
 on-run-start:
   - "CREATE DATABASE IF NOT EXISTS raw_data"  
