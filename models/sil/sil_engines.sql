@@ -6,8 +6,7 @@
 
     tblproperties={
       'quality': 'silver',
-      'pipelines.autoOptimize.managed': 'true',
-      'delta.liquidClustering.enabled': 'true'
+      'pipelines.autoOptimize.managed': 'true'
     },
 
     post_hook=[
@@ -27,7 +26,7 @@ WITH src AS (
     CAST(ingest_ts            AS TIMESTAMP) AS ingest_ts,
     CAST(source_file          AS STRING)    AS source_file,
     _rescue
-  FROM {{ source('brz', 'brz_engines_auto_dlt') }}   --FROM {{ ref('brz_engines') }}
+  FROM {{ source('brz', 'brz_engines_auto_dlt') }}
 ),
 
 incoming AS (

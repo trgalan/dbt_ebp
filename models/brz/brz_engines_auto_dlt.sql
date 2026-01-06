@@ -33,6 +33,7 @@ FROM STREAM read_files(
   "abfss://root@0815sa.dfs.core.windows.net/p30s_ebp/p30s_ebp_dev/inbound/",
   format => "csv",
   header => "true",
+  pathGlobFilter => "engine*.csv",
   schema => "engine_id STRING,
              engine_model_id STRING,
              serial_number STRING,

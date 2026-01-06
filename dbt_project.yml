@@ -44,6 +44,9 @@ models:
     sil:
       +materialized: table
       +schema: sil  
+    p_ebp:
+      +materialized: table
+      +schema: p_ebp
 
 on-run-start:
   - "CREATE DATABASE IF NOT EXISTS raw_data"  

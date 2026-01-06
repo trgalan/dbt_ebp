@@ -4,7 +4,6 @@ sources:
   - name: brz
     description: "Bronze (raw/ingest) Delta tables produced by ingestion pipelines."
 
-
     tables:
       - name: brz_engines_auto_dlt
         description: "Bronze engines streaming ingestion output (typed as strings + metadata columns)."
@@ -45,3 +44,10 @@ sources:
 
           - name: _rescue
             description: "Rescued / malformed fields captured during permissive parsing."
+
+  - name: sil
+    description: "sil (raw/ingest) Delta tables produced by ingestion pipelines."
+
+    tables:
+      - name: sil_engines
+        description: "sil engines streaming ingestion output (typed as strings + metadata columns)."
