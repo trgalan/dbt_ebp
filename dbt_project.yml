@@ -47,9 +47,16 @@ models:
     p_ebp:
       +materialized: table
       +schema: p_ebp
+    ebp_brz:
+      +materialized: table
+      +schema: ebp_brz
+    ebp_sil:
+      +materialized: table
+      +schema: ebp_sil
+    ebp_gld:
+      +materialized: table
+      +schema: ebp_gld
 
 on-run-start:
-  - "CREATE DATABASE IF NOT EXISTS raw_data"  
-
-
-
+  - "CREATE DATABASE IF NOT EXISTS raw_data"
+  

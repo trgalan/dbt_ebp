@@ -1,11 +1,12 @@
-
 {{ config(
     materialized = 'streaming_table', file_format  = 'delta', tblproperties = { 'quality': 'bronze', 'data_domain': 'EBP.OperationalEventsTelemetry','pii': 'none',
-      'abac_sensitivity': 'Operational','retention': 'raw-immutable','owner': 'data-platform','pipelines.autoOptimize.managed': 'true'    }) }}
+      'abac_sensitivity': 'Operational','retention': 'raw-immutable','owner_A': 'data-platform','pipelines.autoOptimize.managed': 'true'    }) }}
 
 select
   cast(event_id as string)                    as event_id,
-  cast(event_ts_utc as timestamp)             as event_ts_utc,
+  --   cast(event_ts_utc as timestamp)             as event_ts_utc,
+  --   try_to_timestamp( regexp_replace(event_ts_utc, "'", ""), 'yyyy-MM-dd HH:mm:ss') AS event_ts_utc,
+  try_to_timestamp( event_ts_utc,  'yyyy-MM-dd')         as event_ts_utc,
   cast(source_system as string)               as source_system,
 
   -- Keep the payload column "source_file" as a separate field if it exists in the CSV;
@@ -13,7 +14,8 @@ select
   cast(source_file as string)                 as source_file,
 
   -- Preserve your original "ingest_ts_utc" column if present in CSV, but the authoritative ingest timestamp is from metadata.
-  cast(ingest_ts_utc as timestamp)            as ingest_ts_utc,
+  --   to_date(ingest_ts_utc, 'yyyy/MM/dd')        as ingest_ts_utc,
+  try_to_timestamp( ingest_ts_utc,  'yyyy-MM-dd') AS ingest_ts_utc,
 
   cast(engine_id as string)                   as engine_id,
   cast(engine_model as string)                as engine_model,
