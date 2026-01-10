@@ -51,3 +51,13 @@ sources:
     tables:
       - name: sil_engines
         description: "sil engines streaming ingestion output (typed as strings + metadata columns)."
+
+  - name: ebp_brz
+
+    tables: 
+      - name: brz_operational_event
+
+  - name: ebp_sil
+
+    tables:
+      - name: sil_operational_event

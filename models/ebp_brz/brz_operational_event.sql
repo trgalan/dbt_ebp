@@ -4,8 +4,6 @@
 
 select
   cast(event_id as string)                    as event_id,
-  --   cast(event_ts_utc as timestamp)             as event_ts_utc,
-  --   try_to_timestamp( regexp_replace(event_ts_utc, "'", ""), 'yyyy-MM-dd HH:mm:ss') AS event_ts_utc,
   try_to_timestamp( event_ts_utc,  'yyyy-MM-dd')         as event_ts_utc,
   cast(source_system as string)               as source_system,
 
@@ -14,7 +12,6 @@ select
   cast(source_file as string)                 as source_file,
 
   -- Preserve your original "ingest_ts_utc" column if present in CSV, but the authoritative ingest timestamp is from metadata.
-  --   to_date(ingest_ts_utc, 'yyyy/MM/dd')        as ingest_ts_utc,
   try_to_timestamp( ingest_ts_utc,  'yyyy-MM-dd') AS ingest_ts_utc,
 
   cast(engine_id as string)                   as engine_id,

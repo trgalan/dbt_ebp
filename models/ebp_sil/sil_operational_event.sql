@@ -8,10 +8,8 @@
       'quality': 'silver',
       'data_domain': 'EBP.OperationalEventsTelemetry',
       'dq_standardized': 'true',
-      'deduped': 'true',
-      'owner': 'data-platform'
-    }
-) }}
+      'deduped': 'true'
+    } ) }}
 
 with src as (
   select
