@@ -1,3 +1,4 @@
+
 {{ config(
     materialized = 'incremental',
     schema = 'ebp_gld',
@@ -49,7 +50,7 @@ resolved as (
       s.threshold_value
 
     from src s
-    left join {{ ref('gld_dim_engine') }} e
+    left join {{ ref('gld_dim_engine_ref') }} e
       on s.engine_id = e.engine_id
 
     left join {{ ref('gld_dim_asset_configuration') }} ac

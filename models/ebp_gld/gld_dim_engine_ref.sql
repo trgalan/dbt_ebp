@@ -17,9 +17,7 @@ with src as (
 
     -- Source of truth for engine attributes
     select distinct
-      engine_id,
-      engine_model,
-      thrust_class
+      engine_id
     from {{ ref('sil_operational_event') }}
     where engine_id is not null
 ),
@@ -32,14 +30,10 @@ prepared as (
 
       -- Surrogate key (new per SCD version)
       {{ dbt_utils.generate_surrogate_key([
-          'engine_id',
-          "coalesce(engine_model,'~')",
-          "coalesce(thrust_class,'~')"
+          'engine_id'
       ]) }} as engine_sk,
 
       engine_id,
-      engine_model,
-      thrust_class,
 
       true  as current_flag,
       current_timestamp() as effective_ts,
