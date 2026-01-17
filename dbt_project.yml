@@ -57,6 +57,7 @@ models:
       +materialized: table
       +schema: ebp_gld
 
+
 on-run-start:
   - "CREATE DATABASE IF NOT EXISTS raw_data"
   

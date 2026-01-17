@@ -3,7 +3,7 @@
     schema               = 'ebp_sil',
     file_format          = 'delta',
     incremental_strategy = 'merge',
-    unique_key           = ['engine_id','effective_ts'],
+    unique_key           = ['engine_id','expiry_ts'],
     on_schema_change     = 'sync_all_columns',
     tblproperties = {
       'quality' : 'silver',
@@ -27,17 +27,17 @@ with src as (
     _rescue
   from {{ ref('brz_engine_ref') }}
   where engine_id is not null
-    and effective_ts is not null
+    and expiry_ts is not null
 ),
 
--- keep latest per (engine_id, effective_ts)
+-- keep latest per (engine_id, expiry_ts)
 dedup as (
   select *
   from (
     select
       s.*,
       row_number() over (
-        partition by s.engine_id, s.effective_ts
+        partition by s.engine_id, s.expiry_ts
         order by s.ingest_ts desc, s.source_file_path desc
       ) as rn
     from src s
