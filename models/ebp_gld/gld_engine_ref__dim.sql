@@ -7,31 +7,26 @@
     tblproperties = { 'quality': 'gold', 'object_type': 'dimension', 'scd_type': '2', 'data_domain': 'EBP.Engine'
     }
 ) }}
-
 -- Dimension: Engine (SCD Type 2)
 -- Business Key: engine_id
 -- PK: engine_sk (surrogate)
 -- SCD control: current_flag, effective_ts, expiry_ts
-
 with src as (
 
     -- Source of truth for engine attributes
     select distinct
       engine_id
-    from {{ ref('sil_operational_event') }}
-    where engine_id is not null
+    from {{ ref('sil_engine_ref') }}
+    where engine_id is not null AND expiry_ts IS null
 ),
 
 prepared as (
-
     select
       -- Stable business key hash for merge logic
       {{ dbt_utils.generate_surrogate_key(['engine_id']) }} as engine_bk_hash,
 
       -- Surrogate key (new per SCD version)
-      {{ dbt_utils.generate_surrogate_key([
-          'engine_id'
-      ]) }} as engine_sk,
+      {{ dbt_utils.generate_surrogate_key(['engine_id']) }} as engine_sk,
 
       engine_id,
 
@@ -43,7 +38,7 @@ prepared as (
 
 select *
 from prepared
-
+{#
 {% if is_incremental() %}
 -- SCD2 behavior:
 -- 1) Expire existing current row when attributes change
@@ -51,4 +46,5 @@ from prepared
 
 -- dbt handles this via MERGE using unique_key = engine_bk_hash
 {% endif %}
+#}
 ;

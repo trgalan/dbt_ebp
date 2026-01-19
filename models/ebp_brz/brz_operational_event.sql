@@ -1,5 +1,6 @@
 {{ config(
-    materialized = 'streaming_table', file_format  = 'delta', tblproperties = { 'quality': 'bronze', 'data_domain': 'EBP.OperationalEventsTelemetry','pii': 'none',
+    materialized = 'streaming_table', file_format  = 'delta', 
+    tblproperties = { 'quality': 'bronze', 'data_domain': 'EBP.OperationalEventsTelemetry','pii': 'none',
       'abac_sensitivity': 'Operational','retention': 'raw-immutable','owner_A': 'data-platform','pipelines.autoOptimize.managed': 'true'    }) }}
 
 select

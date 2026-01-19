@@ -1,15 +1,16 @@
 {{ config(
-    materialized='incremental',
-    incremental_strategy='merge',
-    unique_key='event_id',
-    schema='ebp_sil',
-    file_format='delta',
-    tblproperties={
+    materialized          = 'incremental',
+    incremental_strategy  = 'merge',
+    unique_key            = ['event_id','event_ts_utc'],
+    schema                = 'ebp_sil',
+    file_format           = 'delta',
+    tblproperties         = {
       'quality': 'silver',
       'data_domain': 'EBP.OperationalEventsTelemetry',
       'dq_standardized': 'true',
       'deduped': 'true'
-    } ) }}
+    }
+) }}
 
 with src as (
   select
@@ -26,16 +27,23 @@ with src as (
     cast(fault_code_count as int)    as fault_code_count,
     cast(threshold_value as double)  as threshold_value,
 
-    to_date(cast(event_ts_utc as timestamp))  as event_date,
-    date_format(cast(event_ts_utc as timestamp), 'yyyyMM') as event_yyyymm
+    to_date(cast(event_ts_utc as timestamp))                 as event_date,
+    date_format(cast(event_ts_utc as timestamp), 'yyyyMM')   as event_yyyymm
   from {{ source('ebp_brz', 'brz_operational_event') }}
   where event_id is not null
-
+    and event_ts_utc is not null
+{#
   {% if is_incremental() %}
-    and cast(ingest_ts_utc as timestamp) >
-        (select coalesce(max(ingest_ts_utc), timestamp'1900-01-01') from {{ this }})
+    -- safer watermark: re-scan a small lookback window to catch late/replayed data
+    and cast(ingest_ts_utc as timestamp) >= (
+      select dateadd(day, -2, coalesce(max(ingest_ts_utc), timestamp'1900-01-01'))
+      from {{ this }}
+    )
   {% endif %}
-),
+#}
+) SELECT * FROM src
+{#
+,
 
 deduped as (
   select * except(rn)
@@ -43,8 +51,8 @@ deduped as (
     select
       *,
       row_number() over (
-        partition by event_id
-        order by ingest_ts_utc desc, event_ts_utc desc
+        partition by event_id, event_ts_utc
+        order by ingest_ts_utc desc
       ) as rn
     from src
   )
@@ -52,3 +60,4 @@ deduped as (
 )
 
 select * from deduped;
+#}
