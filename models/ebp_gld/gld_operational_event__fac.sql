@@ -4,7 +4,7 @@
     schema = 'ebp_gld',
     file_format = 'delta',
     incremental_strategy = 'merge',
-    unique_key = ['event_id','ingest_ts_utc'],
+    unique_key = ['event_id','event_ts_utc'],
     tblproperties = {
       'quality': 'gold', 'object_type': 'fact', 'grain': '1 row per operational event_id', 'data_domain': 'EBP.OperationalEventsTelemetry'
     }
