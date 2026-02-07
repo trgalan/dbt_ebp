@@ -14,7 +14,7 @@ select
   cast(current_flag as boolean) as current_flag,
   -- ISO-8601 UTC timestamps with Z suffix
   try_to_timestamp(effective_ts) as effective_ts,
-  try_to_timestamp(expiry_ts)    as expiry_ts,
+  try_to_timestamp(expiry_ts)    as expiry_ts, 
   -- ingestion timestamp from file metadata
   _metadata.file_modification_time as ingest_ts,
   -- file path from file metadata

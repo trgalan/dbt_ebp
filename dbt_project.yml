@@ -60,4 +60,9 @@ models:
 
 on-run-start:
   - "CREATE DATABASE IF NOT EXISTS raw_data"
+
+#
+# 1. gld_engine_ref__dim - Object constraint for dim engine table
+#    "ALTER TABLE {{ this }} ADD CONSTRAINT pk_{{ this.name }} PRIMARY KEY (engine_sk)"
+#
   

@@ -1,50 +1,58 @@
-{{ config(
-    materialized = 'incremental',
-    schema = 'ebp_gld',
-    file_format = 'delta',
-    incremental_strategy = 'merge',
-    unique_key = 'engine_bk_hash',
-    tblproperties = { 'quality': 'gold', 'object_type': 'dimension', 'scd_type': '2', 'data_domain': 'EBP.Engine'
-    }
-) }}
--- Dimension: Engine (SCD Type 2)
+-- Model: gld_engine_ref__dim (NON-SCD)
 -- Business Key: engine_id
--- PK: engine_sk (surrogate)
--- SCD control: current_flag, effective_ts, expiry_ts
-with src as (
+-- Grain: 1 row per (engine_id, engine_model)
+-- PK: engine_sk (surrogate, deterministic)
+-- Desc:
+{{ config(
+    materialized         = 'incremental',
+    schema               = 'ebp_gld',
+    file_format          = 'delta',
+    incremental_strategy = 'merge',
+    unique_key           = ['engine_id', 'engine_model'],
+    on_schema_change     = 'sync_all_columns',
+    tblproperties        = {
+      'quality': 'gold',
+      'object_type': 'dimension',
+      'data_domain': 'EBP.Engine'
+    },
 
-    -- Source of truth for engine attributes
-    select distinct
-      engine_id
-    from {{ ref('sil_engine_ref') }}
-    where engine_id is not null AND expiry_ts IS null
+    post_hook = [
+      "ALTER TABLE {{ this }} ALTER COLUMN engine_sk SET NOT NULL"
+      
+    ]
+) }}
+
+with src as (
+  select
+    engine_id,
+    engine_model,
+    thrust_class
+  from {{ ref('sil_engine_ref') }}
+  where engine_id is not null
+    and engine_model is not null
 ),
 
-prepared as (
-    select
-      -- Stable business key hash for merge logic
-      {{ dbt_utils.generate_surrogate_key(['engine_id']) }} as engine_bk_hash,
-
-      -- Surrogate key (new per SCD version)
-      {{ dbt_utils.generate_surrogate_key(['engine_id']) }} as engine_sk,
-
-      engine_id,
-
-      true  as current_flag,
-      current_timestamp() as effective_ts,
-      cast(null as timestamp) as expiry_ts
-    from src
+dedup as (
+  select
+    engine_id,
+    engine_model,
+    thrust_class,
+    row_number() over (
+      partition by engine_id, engine_model
+      order by engine_id, engine_model
+    ) as rn
+  from src
 )
 
-select *
-from prepared
-{#
-{% if is_incremental() %}
--- SCD2 behavior:
--- 1) Expire existing current row when attributes change
--- 2) Insert new row with new surrogate key
-
--- dbt handles this via MERGE using unique_key = engine_bk_hash
-{% endif %}
-#}
+select
+  -- ensure dbt produces a non-null value in all cases
+  {{ dbt_utils.generate_surrogate_key(['engine_id','engine_model']) }} as engine_sk,
+  engine_id,
+  engine_model,
+  thrust_class,
+  true                    as current_flag,
+  current_timestamp()     as effective_ts,
+  cast(null as timestamp) as expiry_ts
+from dedup
+where rn = 1
 ;
